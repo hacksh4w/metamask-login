@@ -18,22 +18,26 @@ function App() {
     return provider;
   };
   
-  const onConnect = async() => {
+   const onConnect = async () => {
     try {
       const currentProvider = detectCurrentProvider();
-      if(currentProvider) {
-        await currentProvider.request({method: 'eth_requestAccounts'});
+      if (currentProvider) {
+        // Request account access
+        const accounts = await currentProvider.request({ method: 'eth_requestAccounts' });
+        const userAccount = accounts[0];
         const web3 = new Web3(currentProvider);
-        const userAccount  =await web3.eth.getAccounts();
-        const account = userAccount[0];
-        let ethBalance = await web3.eth.getBalance(account);
-        setEthBalance(ethBalance);
+        console.log('Connected account:', userAccount);
+
+        // Fetch and set the balance
+        const weiBalance = await web3.eth.getBalance(userAccount);
+        const etherBalance = web3.utils.fromWei(weiBalance, 'ether');
+        setEthBalance(etherBalance);
         setIsConnected(true);
       }
-    } catch(err) {
-      console.log(err);
+    } catch (err) {
+      console.error(err);
     }
-  }
+  };
   
   const onDisconnect = () => {
     setIsConnected(false);
